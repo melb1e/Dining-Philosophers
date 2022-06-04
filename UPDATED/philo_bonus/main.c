@@ -44,7 +44,7 @@ void	*meals_checker(void *arg)
 	sem_wait(inst->report_status);
 	i = 0;
 	while (i < inst->number)
-		kill(inst->philos[i]->function_pid, SIGKILL);
+		kill(inst->philos[i]->pid, SIGKILL);
 	return (NULL);
 }
 
@@ -56,6 +56,8 @@ static int	ft_strcmp(char *str1, char *str2)
 	size_t	i;
 
 	i = 0;
+	if ((!str1 && str2) || (!str2 && str1))
+		return (ERROR);
 	while (str1[i] && str2[i])
 	{
 		if (str1[i]== str2[i])
@@ -136,7 +138,7 @@ time_t	ft_timestamp(void)
 	return (ms);
 }
 
-void	child_state(t_inst *inst)
+void	kill_children(t_inst *inst)
 {
 	int	i;
 	int	j;
@@ -147,9 +149,9 @@ void	child_state(t_inst *inst)
 	{
 		j = 0;
 		waitpid(-1, &status, 0);
-		if (__WTERMSIG(status) || __WIFSIGNALED(status))
+		if (WIFSIGNALED(status) || WIFEXITED(status))
 			while (j < inst->number)
-				kill(inst->philos[j++]->function_pid, SIGKILL);
+				kill(inst->philos[j++]->pid, SIGKILL);
 		i++;
 	}
 	return ;
@@ -160,26 +162,26 @@ int	thread_master(t_inst *inst)
 	int	i;
 
 	i = 0;
-	if (inst->meals_goal != ERROR_OVERFLOW && pthread_create(\
-		&inst->meals_done, NULL, &meals_checker, (void *)inst))
+	if (inst->meals_goal < -1 && pthread_create(&inst->meals_done, \
+		NULL, &meals_checker, (void *)inst))
 		return (ERROR_THREADS);
 	inst->timestamp = ft_timestamp();
 	while (i < inst->number)
 	{
-		inst->philos[i]->function_pid = fork();
+		inst->philos[i]->pid = fork();
 		inst->philos[i]->last_ate = ft_timestamp();
-		if (inst->philos[i]->function_pid == 0)
+		if (inst->philos[i]->pid == 0)
 		{
 			if (pthread_create(&inst->philos[i]->dead, NULL, &death_checker, \
 				(void *)inst->philos[i]))
 				return (ERROR_THREADS);
 			kettle(inst->philos[i]);
-			exit(EXIT_FAILURE);
+			exit(1);
 		}
 		usleep(100);
 		i++;
 	}
-	child_state(inst);
+	kill_children(inst);
 	return (OK);
 }
 
@@ -204,7 +206,7 @@ t_philos	**create_philos(t_inst *inst)
 	int			i;
 
 	i = 0;
-	philos = (t_philos **)malloc(sizeof(t_philos *) * inst->number + 1);
+	philos = (t_philos **)malloc(sizeof(t_philos *) * inst->number);
 	if (philos == NULL)
 		return (NULL);
 	while (i < inst->number)
@@ -286,20 +288,20 @@ t_inst	*initialization(int ac, const char **av)
 /*
 **	Check arguments for errors
 */
-static	int	ft_overflow(unsigned long long nbr, int sign)
+static	int	ft_overflow(unsigned long nbr, int sign)
 {
-	if (nbr > ULLONG_MAX && sign == -1)
+	if (sign == -1)
 		return (ERROR_OVERFLOW);
-	else if ((nbr > 2147483647 && sign == 1) || (nbr > 2147483648 && sign == -1))
+	else if ((nbr > 2147483647 && sign == 1) || nbr > 2147483648)
 		return (ERROR_OVERFLOW);
 	return (nbr * sign);
 }
 
 int	ft_atoi(const char *str)
 {
-	unsigned long long	nbr;
-	long long			sign;
-	int				i;
+	unsigned long	nbr;
+	long			sign;
+	size_t			i;
 
 	i = 0;
 	nbr = 0;

@@ -24,7 +24,7 @@ typedef struct s_philos
 {
 	int				id;
 	int				meals_done;
-	pid_t			function_pid;
+	pid_t			pid;
 	sem_t			*philo_eat;
 	time_t			last_ate;
 	pthread_t		dead;
