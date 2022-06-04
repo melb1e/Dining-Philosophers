@@ -6,7 +6,7 @@
 /*   By: mmarcele <mmarcele@student.21-school.ru    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 23:29:37 by mmarcele          #+#    #+#             */
-/*   Updated: 2022/06/05 00:38:07 by mmarcele         ###   ########.fr       */
+/*   Updated: 2022/06/05 01:12:58 by mmarcele         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,20 +20,6 @@ time_t	ft_timestamp(void)
 	gettimeofday(&time, NULL);
 	ms = time.tv_sec * 1000 + time.tv_usec / 1000;
 	return (ms);
-}
-
-static int	thread_canceller(t_inst *inst, int e_status)
-{
-	int	i;
-
-	i = 0;
-	while (i < inst->number)
-	{
-		pthread_cancel(inst->philos[i]->thread);
-		pthread_cancel(inst->philos[i]->dead);
-		i++;
-	}
-	return (e_status);
 }
 
 int	thread_master(t_inst *inst)
@@ -62,5 +48,5 @@ int	thread_master(t_inst *inst)
 	}
 	while (!inst->death_status)
 		continue ;
-	return (thread_canceller(inst, OK));
+	return (OK);
 }

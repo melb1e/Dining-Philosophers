@@ -5,51 +5,34 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: mmarcele <mmarcele@student.21-school.ru    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/04 23:29:44 by mmarcele          #+#    #+#             */
-/*   Updated: 2022/06/05 01:16:33 by mmarcele         ###   ########.fr       */
+/*   Created: 2022/06/05 00:46:08 by mmarcele          #+#    #+#             */
+/*   Updated: 2022/06/05 00:57:59 by mmarcele         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philo.h"
 
-static void	ft_free(t_inst *inst)
+int main(int ac, char **av)
 {
-	int	i;
+	t_philos		*philo;
+	int			e_status;
 
-	i = 0;
-	if (inst)
-	{
-		while (i < inst->number)
-		{
-			pthread_mutex_destroy(&inst->philos[i]->eat_status);
-			pthread_mutex_destroy(&inst->forks[i]);
-			free(inst->philos[i]);
-		}
-		pthread_mutex_destroy(&inst->report_status);
-		free(inst->forks);
-		free(inst->philos);
-		free(inst);
-	}
-}
-
-int	main(const int ac, const char **av)
-{
-	t_inst	*inst;
-	long	e_status;
-
-	inst = NULL;
+	philo = NULL;
 	e_status = scan_args(ac, av);
 	if (e_status == OK)
 	{
-		inst = initialization(ac, av);
-		if (inst == NULL)
-			return (ft_error(ERROR_INITIALIZATION));
-		e_status = thread_master(inst);
+		philo = initialization(ac, av);
+		if (philo == NULL)
+			ft_error(philo, ERROR_INITIALIZATION, 3);
+		if (create_semaphores(philo) != OK)
+			ft_error(philo, ERROR_SEMAPHORE, 3);
+		e_status = thread_master(philo);
 		if (e_status != OK)
-			return (ft_error(e_status));
+			ft_error(philo, e_status, 3);
+		free(philo->pid);
+		free(philo);
 	}
 	else
-		return (ft_error(e_status));
-	ft_free(inst);
-	return (OK);
+		ft_error(NULL, e_status, 1);
+	exit(OK);
 }

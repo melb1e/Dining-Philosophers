@@ -6,7 +6,7 @@
 #    By: mmarcele <mmarcele@student.21-school.ru    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/06/05 00:35:48 by mmarcele          #+#    #+#              #
-#    Updated: 2022/06/05 00:36:10 by mmarcele         ###   ########.fr        #
+#    Updated: 2022/06/05 00:45:15 by mmarcele         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -35,18 +35,10 @@ CFLAGS			:=	-Wall -Wextra -Werror #-g #-fsanitize=address
 CINCLUDES		:=	-I ${INCLUDES}
 CDEPENDENCIES	:=	-pthread -lpthread
 
-# ============================================================================ #
-#                                   COLOR                                      #
-# ============================================================================ #
-
 NO_COLOR = \033[0m
 
 TEXT = $(NO_COLOR)\033[0;34m
 PRIMATY_TEXT = $(NO_COLOR)\033[1;36m
-
-# ============================================================================ #
-#                                   RULES                                      #
-# ============================================================================ #
 
 ${OBJECTS}/%.o: ${SOURCES}/%.c ${INCLUDES}/defines.h ${INCLUDES}/philo.h Makefile
 	@mkdir -p $(dir $@)

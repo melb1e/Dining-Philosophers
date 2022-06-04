@@ -38,29 +38,15 @@ typedef struct s_freak
 	pid_t			*pid;
 }					t_philos;
 
-/*
-** Initialization and scanning of given arguments
-*/
 int					scan_args(int ac, char **av);
-t_philos				*initialization(int ac, char **av);
-
-/*
-** Thread creation
-*/
+t_philos			*initialization(int ac, char **av);
+int					create_semaphores(t_philos *philo);
 int					thread_master(t_philos *philo);
 pthread_mutex_t		*create_forks(t_philos *philo);
-t_philos				**create_philos(t_philos *philo);
-
-/*
-** Master functions
-*/
+t_philos			**create_philos(t_philos *philo);
 int					kettle(t_philos *arg);
 void				*death_checker(void *arg);
 void				*meals_checker(void *arg);
-
-/*
-** Utils functions
-*/
 time_t				ft_timestamp(void);
 void				display_status(t_philos *philo, int id, char *action);
 int					ft_atoi(char *str);
