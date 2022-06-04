@@ -3,26 +3,75 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: mashad <mashad@student.42.fr>              +#+  +:+       +#+         #
+#    By: mmarcele <mmarcele@student.21-school.ru    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2021/08/22 11:06:15 by mashad            #+#    #+#              #
-#    Updated: 2021/08/27 20:35:15 by mashad           ###   ########.fr        #
+#    Created: 2022/06/05 00:35:48 by mmarcele          #+#    #+#              #
+#    Updated: 2022/06/05 00:36:10 by mmarcele         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME=philo
-CC=gcc
-FLAGS=-Wall -Werror -Wextra -pthread
-SRCS=main.c errors.c defines.h philo.h
+NAME			:=	philo
 
-all: $(NAME)
+SOURCES			:=	./sources
+INCLUDES		:=	./includes
+OBJECTS			:=	./objects
 
-$(NAME) : $(SRCS)
-	$(CC) $(FLAGS) $(SRCS) -o $(NAME)
+SRCS			:=	main.c \
+					initialization.c \
+					threads.c \
+					life.c \
+					status.c \
+					death.c \
+					errors.c \
+					utils.c
+
+HEADERS			:=	defines.h \
+					philo.h
+
+OBJS			:=	$(addprefix ${OBJECTS}/, $(SRCS:.c=.o))
+
+CC				:=	clang
+CFLAGS			:=	-Wall -Wextra -Werror #-g #-fsanitize=address
+CINCLUDES		:=	-I ${INCLUDES}
+CDEPENDENCIES	:=	-pthread -lpthread
+
+# ============================================================================ #
+#                                   COLOR                                      #
+# ============================================================================ #
+
+NO_COLOR = \033[0m
+
+TEXT = $(NO_COLOR)\033[0;34m
+PRIMATY_TEXT = $(NO_COLOR)\033[1;36m
+
+# ============================================================================ #
+#                                   RULES                                      #
+# ============================================================================ #
+
+${OBJECTS}/%.o: ${SOURCES}/%.c ${INCLUDES}/defines.h ${INCLUDES}/philo.h Makefile
+	@mkdir -p $(dir $@)
+	@printf "$(TEXT)Successfully Created $(PRIMATY_TEXT)$@'s Object files $(TEXT)\n"
+	@${CC} ${CFLAGS} -o $@ -c $< ${CINCLUDES}
+
+all: ${NAME}
+
+${NAME}: ${OBJS}
+	@${CC} ${CFLAGS} -o ${NAME} ${OBJS} ${CDEPENDENCIES}
+	@printf "$(TEXT)Successfully Created $(PRIMATY_TEXT)$@ $(TEXT)\n$(NO_COLOR)"
+
 
 clean:
-	rm -rf $(NAME)
+	@printf "$(TEXT)Cleaning $(PRIMATY_TEXT)$(NAME)'s Object files...\n"
+	@rm -rf ${OBJECTS}
 
 fclean: clean
+	@printf "$(TEXT)Cleaning $(PRIMATY_TEXT)$(NAME)\n"
+	@rm -f ${NAME}
+
+norminette:
+	@printf "$(TEXT)Checking norminette $(PRIMATY_TEXT)$(NAME)\n"
+	norminette $(SOURCES) $(INCLUDES)
 
 re: fclean all
+
+.PHONY:	all clean fclean re norminette

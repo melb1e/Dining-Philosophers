@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   philo.h                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mmarcele <mmarcele@student.21-school.ru    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/06/04 23:30:03 by mmarcele          #+#    #+#             */
+/*   Updated: 2022/06/05 00:35:35 by mmarcele         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef PHILO_H
 # define PHILO_H
 
@@ -52,8 +64,6 @@ t_inst				*initialization(int ac, const char **av);
 ** Thread creation
 */
 int					thread_master(t_inst *inst);
-pthread_mutex_t		*create_forks(t_inst *inst);
-t_philos			**create_philos(t_inst *inst);
 
 /*
 ** Master functions
