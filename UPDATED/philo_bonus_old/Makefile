@@ -10,7 +10,7 @@
 #                                                                              #
 # **************************************************************************** #
 
-NAME=philo
+NAME=philo_bonus
 CC=gcc
 FLAGS=-Wall -Werror -Wextra -pthread
 SRCS=main.c errors.c defines.h philo.h

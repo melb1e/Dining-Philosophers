@@ -20,41 +20,52 @@
 */
 # include "defines.h"
 
-typedef struct s_freak
+typedef struct s_philos
 {
 	int				id;
+	int				meals_done;
+	pid_t			pid;
+	sem_t			*philo_eat;
+	time_t			last_ate;
+	pthread_t		dead;
+	pthread_t		thread_meals;
+	struct s_inst	*installments;
+}					t_philos;
+
+typedef struct s_inst
+{
 	int				number;
 	time_t			time_to_die;
 	time_t			time_to_eat;
 	time_t			time_to_sleep;
 	int				meals_goal;
-	int				meals_done;
 	int				dead;
-	time_t			last_ate;
 	time_t			timestamp;
-	pthread_t		death_status;
-	sem_t			*forks_status;
+	sem_t			*forks;
+	sem_t			*death_status;
 	sem_t			*report_status;
-	pid_t			*pid;
-}					t_philos;
+	sem_t			*eat_status;
+	pthread_t		meals_done;
+	t_philos		**philos;
+}					t_inst;
 
 /*
 ** Initialization and scanning of given arguments
 */
-int					scan_args(int ac, char **av);
-t_philos				*initialization(int ac, char **av);
+int					scan_args(const int ac, const char **av);
+t_inst				*initialization(int ac, const char **av);
 
 /*
 ** Thread creation
 */
-int					thread_master(t_philos *philo);
-pthread_mutex_t		*create_forks(t_philos *philo);
-t_philos				**create_philos(t_philos *philo);
+int					thread_master(t_inst *inst);
+pthread_mutex_t		*create_forks(t_inst *inst);
+t_philos			**create_philos(t_inst *inst);
 
 /*
 ** Master functions
 */
-int					kettle(t_philos *arg);
+void				*kettle(t_philos *arg);
 void				*death_checker(void *arg);
 void				*meals_checker(void *arg);
 
@@ -62,8 +73,8 @@ void				*meals_checker(void *arg);
 ** Utils functions
 */
 time_t				ft_timestamp(void);
-void				display_status(t_philos *philo, int id, char *action);
-int					ft_atoi(char *str);
-int					ft_error(t_philos *philo, int e_status, int level);
+void				display_status(t_inst *inst, size_t id, char *status);
+int					ft_atoi(const char *str);
+int					ft_error(int e_status);
 
 #endif

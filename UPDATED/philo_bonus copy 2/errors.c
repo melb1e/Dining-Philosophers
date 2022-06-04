@@ -18,17 +18,7 @@ static char	*ft_erno_helper(int e_status)
 		return (ERROR_UNKNOWN_STRING);
 }
 
-static void	ft_free(t_philos *philo)
-{
-	sem_unlink("/report");
-	sem_unlink("/forks");
-	sem_close(philo->report_status);
-	sem_close(philo->forks_status);
-	free(philo->pid);
-	free(philo);
-}
-
-int	ft_error(t_philos *philo, int e_status, int level)
+int	ft_error(int e_status)
 {
 	if (!e_status)
 	{
@@ -39,7 +29,5 @@ int	ft_error(t_philos *philo, int e_status, int level)
 	{
 		printf("%s\n", ft_erno_helper(e_status));
 	}
-	if (level == 3)
-		ft_free(philo);
 	return (e_status);
 }

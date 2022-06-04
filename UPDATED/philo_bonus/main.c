@@ -11,41 +11,20 @@ void	*death_checker(void *arg)
 	philo = (t_philos *)arg;
 	while (TRUE)
 	{
-		sem_wait(philo->philo_eat);
-		if (ft_timestamp() - philo->last_ate >= philo->installments->time_to_die)
+		if (philo->meals_goal)
+			if (philo->meals_goal == philo->meals_done)
+				break ;
+		if (ft_timestamp() - philo->last_ate >= philo->time_to_die)
 		{
-			display_status(philo->installments, philo->id, PHILO_DEAD);
-			exit(EXIT_FAILURE);
+			philo->dead = 1;
+			display_status(philo, philo->id, PHILO_DEAD);
+			break ;
 		}
-		sem_post(philo->philo_eat);
-		usleep(100);
 	}
-	return (NULL);
-}
-
-void	*meals_checker(void *arg)
-{
-	t_inst	*inst;
-	int		meals_done;
-	int		i;
-
-	inst = (t_inst *)arg;
-	meals_done = 0;
-	while (meals_done < inst->meals_goal)
-	{
-		i = 0;
-		while (i < inst->number)
-		{
-			sem_wait(inst->eat_status);
-			i++;
-		}
-		meals_done += 1;
-	}
-	sem_wait(inst->report_status);
-	i = 0;
-	while (i < inst->number)
-		kill(inst->philos[i]->pid, SIGKILL);
-	return (NULL);
+	if (philo->dead)
+		exit(EXIT_FAILURE);
+	else
+		exit(0);
 }
 
 /*
@@ -68,17 +47,17 @@ static int	ft_strcmp(char *str1, char *str2)
 	return (OK);
 }
 
-void	display_status(t_inst *inst, size_t id, char *status)
+void	display_status(t_philos *philo, int id, char *action)
 {
-	sem_wait(inst->report_status);
-	printf("%li %li %s\n", ft_timestamp() - inst->timestamp, id + 1, status);
-	if (ft_strcmp(status, PHILO_DEAD))
-		sem_post(inst->report_status);
+	sem_wait(philo->report_status);
+	printf("%li %i %s\n", ft_timestamp() - philo->timestamp, id + 1, action);
+	if (ft_strcmp(action, PHILO_DEAD))
+		sem_post(philo->report_status);
 }
 
 static void	philo_think(t_philos *philo)
 {
-	display_status(philo->installments, philo->id, PHILO_THINKING);
+	display_status(philo, philo->id, PHILO_THINKING);
 	return ;
 }
 
@@ -86,43 +65,67 @@ static void	philo_sleep(t_philos *philo)
 {
 	time_t	time;
 
-	display_status(philo->installments, philo->id, PHILO_SLEEPING);
+	display_status(philo, philo->id, PHILO_SLEEPING);
 	time = ft_timestamp();
-	usleep(philo->installments->time_to_sleep);
-	while (ft_timestamp() - time < philo->installments->time_to_sleep)
+	usleep(philo->time_to_sleep);
+	while (ft_timestamp() - time < philo->time_to_sleep)
 		continue ;
 	return ;
 }
 
-static void	philo_eat(t_philos *philo)
+static int	philo_eat(t_philos *philo)
 {
-	sem_wait(philo->installments->forks);
-	display_status(philo->installments, philo->id, PHILO_HAS_LEFT_FORK);
-	sem_wait(philo->installments->forks);
-	display_status(philo->installments, philo->id, PHILO_HAS_RIGHT_FORK);
-	sem_wait(philo->philo_eat);
-	display_status(philo->installments, philo->id, PHILO_EATING);
+	sem_wait(philo->forks_status);
+	display_status(philo, philo->id, PHILO_HAS_LEFT_FORK);
+	if (philo->number == 1)
+		sem_post(philo->forks_status);
+	if (philo->number == 1)
+		return (EXIT_FAILURE);
+	sem_wait(philo->forks_status);
+	display_status(philo, philo->id, PHILO_HAS_RIGHT_FORK);
+	display_status(philo, philo->id, PHILO_EATING);
 	philo->last_ate = ft_timestamp();
-	usleep(philo->installments->time_to_eat);
-	while (ft_timestamp() - philo->last_ate < philo->installments->time_to_eat)
+	usleep(philo->time_to_eat);
+	while (ft_timestamp() - philo->last_ate < philo->time_to_eat)
 		continue ;
-	sem_post(philo->philo_eat);
-	sem_post(philo->installments->forks);
-	sem_post(philo->installments->forks);
-	sem_post(philo->installments->eat_status);
+	philo->meals_done += 1;
+	sem_post(philo->forks_status);
+	sem_post(philo->forks_status);
+	return (OK);
+}
+
+void	ft_usleep(time_t time)
+{
+	time_t	initial;
+
+	initial = ft_timestamp();
+	while (ft_timestamp() - initial < time)
+		usleep(100);
 	return ;
 }
 
-void	*kettle(t_philos *philo)
+int	kettle(t_philos *philo)
 {
+	if (pthread_create(&philo->death_status, NULL, &death_checker, (void *)philo))
+		return (ERROR_THREADS);
+	if (philo->id % 2 == 1)
+		ft_usleep(500);
 	while (TRUE)
 	{
-		philo_eat(philo);
-		philo_sleep(philo);
-		philo_think(philo);
-		usleep(100);
+		if (philo->meals_goal)
+			if (philo->meals_goal == philo->meals_done)
+				break ;
+		if (philo_eat(philo))
+			break ;
+		else
+		{
+			philo_sleep(philo);
+			philo_think(philo);
+		}
 	}
-	return (NULL);
+	if (pthread_join(philo->dead, NULL))
+		return (ERROR_THREADS);
+	return (OK);
 }
 
 /*
@@ -138,121 +141,72 @@ time_t	ft_timestamp(void)
 	return (ms);
 }
 
-void	kill_children(t_inst *inst)
-{
-	int	i;
-	int	j;
-	int	status;
-
-	i = 0;
-	while (i < inst->number)
-	{
-		j = 0;
-		waitpid(-1, &status, 0);
-		if (WIFSIGNALED(status) || WIFEXITED(status))
-			while (j < inst->number)
-				kill(inst->philos[j++]->pid, SIGKILL);
-		i++;
-	}
-	return ;
-}
-
-int	thread_master(t_inst *inst)
+static int	kill_children(t_philos *philo)
 {
 	int	i;
 
 	i = 0;
-	if (inst->meals_goal < -1 && pthread_create(&inst->meals_done, \
-		NULL, &meals_checker, (void *)inst))
-		return (ERROR_THREADS);
-	inst->timestamp = ft_timestamp();
-	while (i < inst->number)
-	{
-		inst->philos[i]->pid = fork();
-		inst->philos[i]->last_ate = ft_timestamp();
-		if (inst->philos[i]->pid == 0)
-		{
-			if (pthread_create(&inst->philos[i]->dead, NULL, &death_checker, \
-				(void *)inst->philos[i]))
-				return (ERROR_THREADS);
-			kettle(inst->philos[i]);
-			exit(1);
-		}
-		usleep(100);
-		i++;
-	}
-	kill_children(inst);
+	while (i < philo->number)
+		kill(philo->pid[i++], SIGKILL);
 	return (OK);
 }
 
-/*
-**	Create philos HERE HERE
-*/
-static t_philos	**free_philos(t_philos **philos)
+int	thread_master(t_philos *philo)
 {
 	int	i;
+	int status;
 
 	i = 0;
-	while (philos[i] != NULL)
-		free(philos[i++]);
-	free(philos);
-	philos = NULL;
-	return (philos);
-}
-
-t_philos	**create_philos(t_inst *inst)
-{
-	t_philos	**philos;
-	int			i;
-
-	i = 0;
-	philos = (t_philos **)malloc(sizeof(t_philos *) * inst->number);
-	if (philos == NULL)
-		return (NULL);
-	while (i < inst->number)
+	philo->timestamp = ft_timestamp();
+	while (i < philo->number)
 	{
-		philos[i] = (t_philos *)malloc(sizeof(t_philos));
-		if (philos[i] == NULL)
-			return (free_philos(philos));
-		sem_unlink("/eat");
-		philos[i]->philo_eat = sem_open("/eat", O_CREAT, S_IRWXU, 1);
-		if (inst->report_status == SEM_FAILED)
-			return (NULL);
-		philos[i]->installments = inst;
-		philos[i]->id = i;
-		philos[i]->meals_done = 0;
-		i++;
+		philo->pid[i] = fork();
+		if (philo->pid[i] == -1)
+			return (ERROR_FORKING);
+		if (philo->pid[i++] == 0)
+		{
+			philo->id = i;
+			philo->last_ate = philo->timestamp;
+			if (kettle(philo) > 0)
+				return (0);
+		}
 	}
-	return (philos);
+	while (waitpid(-1, &status, 0) > 0)
+	{
+		if (WIFSIGNALED(status) || WIFEXITED(status))
+			return (kill_children(philo));
+	}
+	return (OK);
 }
 
 /*
 **	Create semaphoress
 */
-int	create_semaphores(t_inst *inst)
+static int	free_semaphore(t_philos *philo, int e_status, int level)
 {
-	if (inst->number <= ERROR_OVERFLOW || \
-	inst->meals_goal < -1 || \
-	inst->time_to_die <= ERROR_OVERFLOW || \
-	inst->time_to_eat <= ERROR_OVERFLOW || \
-	inst->time_to_sleep <= ERROR_OVERFLOW)
-		return (ERROR_INPUT);
+	if (level == 3)
+		free(philo->pid);
+	free(philo);
+	return (e_status);
+}
+
+int	create_semaphores(t_philos *philo)
+{
 	sem_unlink("/forks");
-	inst->forks = sem_open("/forks", O_CREAT, S_IRWXU, inst->number);
-	if (inst->forks == SEM_FAILED)
-		return (ERROR_SEMAPHORE);
 	sem_unlink("/report");
-	inst->report_status = sem_open("/report", O_CREAT, S_IRWXU, 1);
-	if (inst->report_status == SEM_FAILED)
-		return (ERROR_SEMAPHORE);
-	sem_unlink("/meals_done");
-	inst->eat_status = sem_open("/meals_done", O_CREAT, S_IRWXU, 1);
-	if (inst->eat_status == SEM_FAILED)
-		return (ERROR_SEMAPHORE);
-	sem_unlink("/die");
-	inst->death_status = sem_open("/die", O_CREAT, S_IRWXU, 1);
-	if (inst->death_status == SEM_FAILED)
-		return (ERROR_SEMAPHORE);
+	philo->forks_status = sem_open("/forks", O_CREAT, S_IRWXU, philo->number);
+	if (philo->forks_status == SEM_FAILED)
+		return (free_semaphore(philo, ERROR_SEMAPHORE, 1));
+	philo->report_status = sem_open("/report", O_CREAT, S_IRWXU, 1);
+	if (philo->report_status == SEM_FAILED)
+		return (free_semaphore(philo, ERROR_SEMAPHORE, 2));
+	philo->pid = malloc(sizeof(pid_t) * philo->number);
+	if (!philo->pid)
+	{
+		sem_close(philo->report_status);
+		sem_close(philo->forks_status);
+		return (free_semaphore(philo, ERROR_SEMAPHORE, 3));
+	}
 	return (OK);
 }
 
@@ -260,48 +214,48 @@ int	create_semaphores(t_inst *inst)
 **	Initialize installments
 */
 
-t_inst	*initialization(int ac, const char **av)
+t_philos	*initialization(int ac, char **av)
 {
-	t_inst	*inst;
+	t_philos	*philo;
 	int		i;
 
 	i = 1;
-	inst = (t_inst *)malloc(sizeof(t_inst));
-	if (inst == NULL)
+	philo = malloc(sizeof(t_philos));
+	if (philo == NULL)
 		return (NULL);
-	inst->number = ft_atoi(av[i++]);
-	inst->time_to_die = ft_atoi(av[i++]);
-	inst->time_to_eat = ft_atoi(av[i++]);
-	inst->time_to_sleep = ft_atoi(av[i]);
-	if (ac - 1 == MAX_ARGS)
-		inst->meals_goal = ft_atoi(av[++i]);
-	else if (ac - 1 == MIN_ARGS)
-		inst->meals_goal = -1;
-	if (create_semaphores(inst) != OK)
-		return (NULL);
-	inst->philos = create_philos(inst);
-	if (inst->philos == NULL || inst->number == 0)
-		return (NULL);
-	return (inst);
+	philo->number = ft_atoi(av[i++]);
+	philo->time_to_die = ft_atoi(av[i++]);
+	philo->time_to_eat = ft_atoi(av[i++]);
+	philo->time_to_sleep = ft_atoi(av[i]);
+	if (ac - 1 == P_MAX_ARGS)
+		philo->meals_goal = ft_atoi(av[++i]);
+	else if (ac - 1 == P_MIN_ARGS)
+		philo->meals_goal = -1;
+	philo->id = 0;
+	philo->meals_done = 0;
+	philo->dead = 0;
+	philo->timestamp = 0;
+	philo->last_ate = 0;
+	return (philo);
 }
 
 /*
 **	Check arguments for errors
 */
-static	int	ft_overflow(unsigned long nbr, int sign)
+static	int	ft_overflow(unsigned long long nbr, int sign)
 {
-	if (sign == -1)
+	if (nbr > ULLONG_MAX && sign == -1)
 		return (ERROR_OVERFLOW);
-	else if ((nbr > 2147483647 && sign == 1) || nbr > 2147483648)
+	else if ((nbr > 2147483647 && sign == 1) || (nbr > 2147483648 && sign == -1))
 		return (ERROR_OVERFLOW);
 	return (nbr * sign);
 }
 
-int	ft_atoi(const char *str)
+int	ft_atoi(char *str)
 {
-	unsigned long	nbr;
-	long			sign;
-	size_t			i;
+	unsigned long long	nbr;
+	long long			sign;
+	int				i;
 
 	i = 0;
 	nbr = 0;
@@ -324,56 +278,39 @@ int	ft_atoi(const char *str)
 	return (ft_overflow(nbr, sign));
 }
 
-static int	ft_isnumeric(const char *str)
+int	scan_args(int ac, char **av)
 {
-	int	i;
-
-	i = 0;
-	while (str[i] != EOL)
-	{
-		if (str[i] <= '0' || str[i] >= '9')
-			return (ERROR);
-		i++;
-	}
-	return (OK);
-}
-
-int	scan_args(const int ac, const char **av)
-{
-	int	i;
-
-	i = 0;
-	if (ac - 1 > MAX_ARGS || ac - 1 < MIN_ARGS)
-		return (ERROR_INPUT);
-	while (i < (int)ac)
-	{
-		if (av[i][0] == '-' && ft_isnumeric(av[i]) != OK)
-			return (ERROR_INPUT);
-		i++;
-	}
-	return (OK);
+	if (ac - 1 <= P_MAX_ARGS && ac - 1 >= P_MIN_ARGS)
+		if (ft_atoi(av[1]) > 0 && ft_atoi(av[2]) > 0 && \
+			ft_atoi(av[3]) > 0 && ft_atoi(av[4]) > 0 &&\
+			(ac - 1 == P_MIN_ARGS || \
+			(ac - 1 == P_MAX_ARGS && ft_atoi(av[5]) > 0)))
+			return (OK);
+	return (ERROR_INPUT);
 }
 
 /*
 **	Main function
 */
-int main(const int ac, const char **av)
+int main(int ac, char **av)
 {
-	t_inst		*inst;
-	long		e_status;
+	t_philos		*philo;
+	int			e_status;
 
-	inst = NULL;
+	philo = NULL;
 	e_status = scan_args(ac, av);
 	if (e_status == OK)
 	{
-		inst = initialization(ac, av);
-		if (inst == NULL)
-			return (ft_error(ERROR_INITIALIZATION));
-		e_status = thread_master(inst);
+		philo = initialization(ac, av);
+		if (philo == NULL)
+			return (ft_error(philo, ERROR_INITIALIZATION, 3));
+		if (create_semaphores(philo) != OK)
+			return (ft_error(philo, ERROR_SEMAPHORE, 3));
+		e_status = thread_master(philo);
 		if (e_status != OK)
-			return (ft_error(e_status));
+			return (ft_error(philo, e_status, 3));
 	}
 	else
-		return (ft_error(e_status));
+		return (ft_error(NULL, e_status, 1));
 	return (OK);
 }

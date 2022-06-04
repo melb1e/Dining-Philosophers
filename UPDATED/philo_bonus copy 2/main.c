@@ -7,23 +7,52 @@
 void	*death_checker(void *arg)
 {
 	t_philos	*philo;
+	// int			i;
 
+	// i = 0;
 	philo = (t_philos *)arg;
-	while (!philo->installments->death_status)
+	while (TRUE)
 	{
-		if (!philo->philo_eat && ft_timestamp() - philo->last_ate >= \
-			philo->installments->time_to_die)
+		sem_wait(philo->philo_eat);
+		if (ft_timestamp() - philo->last_ate >= philo->installments->time_to_die)
 		{
-			pthread_mutex_lock(&philo->eat_status);
 			display_status(philo->installments, philo->id, PHILO_DEAD);
-			philo->installments->death_status = 1;
-			pthread_mutex_unlock(&philo->eat_status);
+			exit(EXIT_FAILURE);
 		}
-		if (philo->installments->philos[philo->installments->number - 1]\
-			->meals_done == philo->installments->meals_goal)
-			philo->installments->death_status = 1;
+		if (philo->installments->philos[philo->installments->number - 1]->meals_done >= \
+				philo->installments->meals_goal)
+		{
+			ft_error(0);
+			exit(philo->installments->meals_goal);
+		}
+		sem_post(philo->philo_eat);
 		usleep(100);
 	}
+	return (NULL);
+}
+
+void	*meals_checker(void *arg)
+{
+	t_philos	*philo;
+	int			i;
+	int			j;
+
+	philo = (t_philos *)arg;
+	i = 0;
+	while (philo->installments->philos[i++]->meals_done < philo->installments->meals_goal)
+	{
+		j = 0;
+		while (j < philo->installments->number)
+		{
+			sem_wait(philo->installments->eat_status);
+			j++;
+		}
+		philo->installments->philos[i++]->meals_done += 1;
+	}
+	sem_wait(philo->installments->report_status);
+	i = 0;
+	while (i < philo->installments->number)
+		kill(philo->installments->philos[i++]->pid, SIGKILL);
 	return (NULL);
 }
 
@@ -35,6 +64,8 @@ static int	ft_strcmp(char *str1, char *str2)
 	size_t	i;
 
 	i = 0;
+	if ((!str1 && str2) || (!str2 && str1))
+		return (ERROR);
 	while (str1[i] && str2[i])
 	{
 		if (str1[i]== str2[i])
@@ -47,10 +78,10 @@ static int	ft_strcmp(char *str1, char *str2)
 
 void	display_status(t_inst *inst, size_t id, char *status)
 {
-	pthread_mutex_lock(&inst->report_status);
+	sem_wait(inst->report_status);
 	printf("%li %li %s\n", ft_timestamp() - inst->timestamp, id + 1, status);
 	if (ft_strcmp(status, PHILO_DEAD))
-		pthread_mutex_unlock(&inst->report_status);
+		sem_post(inst->report_status);
 }
 
 static void	philo_think(t_philos *philo)
@@ -73,31 +104,29 @@ static void	philo_sleep(t_philos *philo)
 
 static void	philo_eat(t_philos *philo)
 {
-	pthread_mutex_lock(&philo->installments->forks[philo->left_fork_id]);
+	sem_wait(philo->installments->forks);
 	display_status(philo->installments, philo->id, PHILO_HAS_LEFT_FORK);
-	pthread_mutex_lock(&philo->installments->forks[philo->right_fork_id]);
+	sem_wait(philo->installments->forks);
 	display_status(philo->installments, philo->id, PHILO_HAS_RIGHT_FORK);
-	pthread_mutex_lock(&philo->eat_status);
-	philo->last_ate = ft_timestamp();
-	philo->philo_eat = 1;
+	sem_wait(philo->philo_eat);
 	display_status(philo->installments, philo->id, PHILO_EATING);
+	philo->last_ate = ft_timestamp();
 	usleep(philo->installments->time_to_eat);
 	while (ft_timestamp() - philo->last_ate < philo->installments->time_to_eat)
 		continue ;
 	philo->meals_done += 1;
-	philo->philo_eat = 0;
-	pthread_mutex_unlock(&philo->installments->forks[philo->left_fork_id]);
-	pthread_mutex_unlock(&philo->installments->forks[philo->right_fork_id]);
-	pthread_mutex_unlock(&philo->eat_status);
+	sem_post(philo->philo_eat);
+	sem_post(philo->installments->forks);
+	sem_post(philo->installments->forks);
+	sem_post(philo->installments->eat_status);
 	return ;
 }
 
-void	*kettle(void *arg)
+void	*kettle(t_philos *philo)
 {
-	t_philos	*philo;
+	if (philo->installments->philos)
 
-	philo = (t_philos *)arg;
-	while (!philo->installments->death_status)
+	while (TRUE)
 	{
 		philo_eat(philo);
 		philo_sleep(philo);
@@ -120,17 +149,23 @@ time_t	ft_timestamp(void)
 	return (ms);
 }
 
-static int	thread_canceller(t_inst *inst)
+void	kill_children(t_inst *inst)
 {
 	int	i;
+	int	j;
+	int	status;
 
 	i = 0;
 	while (i < inst->number)
 	{
-		pthread_cancel(inst->philos[i]->thread);
-		pthread_cancel(inst->philos[i++]->dead);
+		j = 0;
+		waitpid(-1, &status, 0);
+		if (WIFSIGNALED(status) || WIFEXITED(status))
+			while (j < inst->number)
+				kill(inst->philos[j++]->pid, SIGKILL);
+		i++;
 	}
-	return (OK);
+	return ;
 }
 
 int	thread_master(t_inst *inst)
@@ -141,25 +176,24 @@ int	thread_master(t_inst *inst)
 	inst->timestamp = ft_timestamp();
 	while (i < inst->number)
 	{
+		inst->philos[i]->pid = fork();
 		inst->philos[i]->last_ate = ft_timestamp();
-		if (pthread_create(&inst->philos[i]->thread, NULL, &kettle, \
-			(void *)inst->philos[i]))
-			return (ERROR_THREADS);
+		if (inst->philos[i]->pid == 0)
+		{
+			if (inst->meals_goal < -1 && pthread_create(&inst->philos[i]->thread_meals, \
+				NULL, &meals_checker, (void *)inst->philos[i]))
+				return (ERROR_THREADS);
+			if (pthread_create(&inst->philos[i]->dead, NULL, &death_checker, \
+				(void *)inst->philos[i]))
+				return (ERROR_THREADS);
+			kettle(inst->philos[i]);
+			exit(1);
+		}
+		usleep(150);
 		i++;
-		usleep(100);
 	}
-	i = 0;
-	while (i < inst->number)
-	{
-		if (pthread_create(&inst->philos[i]->dead, NULL, &death_checker, \
-			(void *)inst->philos[i]))
-			return (ERROR_THREADS);
-		i++;
-		usleep(100);
-	}
-	while (!inst->death_status)
-		continue ;
-	return (thread_canceller(inst));
+	kill_children(inst);
+	return (OK);
 }
 
 /*
@@ -183,7 +217,7 @@ t_philos	**create_philos(t_inst *inst)
 	int			i;
 
 	i = 0;
-	philos = (t_philos **)malloc(sizeof(t_philos *) * inst->number + 1);
+	philos = (t_philos **)malloc(sizeof(t_philos *) * inst->number);
 	if (philos == NULL)
 		return (NULL);
 	while (i < inst->number)
@@ -191,42 +225,46 @@ t_philos	**create_philos(t_inst *inst)
 		philos[i] = (t_philos *)malloc(sizeof(t_philos));
 		if (philos[i] == NULL)
 			return (free_philos(philos));
-		if (pthread_mutex_init(&philos[i]->eat_status, NULL))
+		sem_unlink("/eat");
+		philos[i]->philo_eat = sem_open("/eat", O_CREAT, S_IRWXU, 1);
+		if (inst->report_status == SEM_FAILED)
 			return (NULL);
 		philos[i]->installments = inst;
 		philos[i]->id = i;
-		philos[i]->philo_eat = 0;
 		philos[i]->meals_done = 0;
-		philos[i]->left_fork_id = i;
-		philos[i]->right_fork_id = (i + 1) % philos[i]->installments->number;
 		i++;
 	}
 	return (philos);
 }
 
 /*
-**	Create forks for installments structure
+**	Create semaphoress
 */
-
-pthread_mutex_t	*create_forks(t_inst *inst)
+int	create_semaphores(t_inst *inst)
 {
-	pthread_mutex_t	*forks;
-	int				i;
-
-	i = 0;
 	if (inst->number <= ERROR_OVERFLOW || \
 	inst->meals_goal < -1 || \
 	inst->time_to_die <= ERROR_OVERFLOW || \
 	inst->time_to_eat <= ERROR_OVERFLOW || \
 	inst->time_to_sleep <= ERROR_OVERFLOW)
-		return (NULL);
-	forks = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * inst->number);
-	if (forks == NULL)
-		return (NULL);
-	while (i < inst->number)
-		if (pthread_mutex_init(&forks[i++], NULL))
-			return (NULL);
-	return (forks);
+		return (ERROR_INPUT);
+	sem_unlink("/forks");
+	inst->forks = sem_open("/forks", O_CREAT, S_IRWXU, inst->number);
+	if (inst->forks == SEM_FAILED)
+		return (ERROR_SEMAPHORE);
+	sem_unlink("/report");
+	inst->report_status = sem_open("/report", O_CREAT, S_IRWXU, 1);
+	if (inst->report_status == SEM_FAILED)
+		return (ERROR_SEMAPHORE);
+	sem_unlink("/meals_done");
+	inst->eat_status = sem_open("/meals_done", O_CREAT, S_IRWXU, 1);
+	if (inst->eat_status == SEM_FAILED)
+		return (ERROR_SEMAPHORE);
+	sem_unlink("/die");
+	inst->death_status = sem_open("/die", O_CREAT, S_IRWXU, 1);
+	if (inst->death_status == SEM_FAILED)
+		return (ERROR_SEMAPHORE);
+	return (OK);
 }
 
 /*
@@ -250,14 +288,10 @@ t_inst	*initialization(int ac, const char **av)
 		inst->meals_goal = ft_atoi(av[++i]);
 	else if (ac - 1 == MIN_ARGS)
 		inst->meals_goal = -1;
-	inst->death_status = 0;
-	inst->forks = create_forks(inst);
-	if (inst->forks == NULL)
+	if (create_semaphores(inst) != OK)
 		return (NULL);
 	inst->philos = create_philos(inst);
 	if (inst->philos == NULL || inst->number == 0)
-		return (NULL);
-	if (pthread_mutex_init(&inst->report_status, NULL) != 0)
 		return (NULL);
 	return (inst);
 }
@@ -265,20 +299,20 @@ t_inst	*initialization(int ac, const char **av)
 /*
 **	Check arguments for errors
 */
-static	int	ft_overflow(unsigned long long nbr, int sign)
+static	int	ft_overflow(unsigned long nbr, int sign)
 {
-	if (nbr > ULLONG_MAX && sign == -1)
+	if (sign == -1)
 		return (ERROR_OVERFLOW);
-	else if ((nbr > 2147483647 && sign == 1) || (nbr > 2147483648 && sign == -1))
+	else if ((nbr > 2147483647 && sign == 1) || nbr > 2147483648)
 		return (ERROR_OVERFLOW);
 	return (nbr * sign);
 }
 
 int	ft_atoi(const char *str)
 {
-	unsigned long long	nbr;
-	long long			sign;
-	int				i;
+	unsigned long	nbr;
+	long			sign;
+	size_t			i;
 
 	i = 0;
 	nbr = 0;
