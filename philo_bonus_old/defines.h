@@ -1,14 +1,6 @@
 #ifndef DEFINES_H
 # define DEFINES_H
 
-# define GREEN							"\033[0;32m"
-# define YELLOW							"\033[0;33m"
-# define RED							"\033[1;31m"
-# define CYAN							"\033[0;36m"
-# define BLUE							"\033[0;34m"
-# define WHITE							"\033[0;37m"
-# define BASIC							"\033[0m"
-
 # define ERROR_INPUT					-101
 # define ERROR_THREADS					-102
 # define ERROR_MEALS					-103
@@ -18,7 +10,6 @@
 # define ERROR_UNKNOWN 					-108
 # define ERROR_FORKS					-110
 # define ERROR_INITIALIZATION			-111
-# define ERROR_FORKING					-112
 
 # define ERROR_OVERFLOW					-202
 
@@ -36,15 +27,15 @@ number_of_times_each_philosopher_must_eat]"
 # define ERROR_UNKNOWN_STRING			"Error 108 [Unknown error]"
 # define ERROR_INITIALIZATION_STRING	"Error 109 [Initialization error]"
 
-# define PHILO_HAS_LEFT_FORK			GREEN"has taken a fork"BASIC
-# define PHILO_HAS_RIGHT_FORK			GREEN"has taken a fork"BASIC
-# define PHILO_EATING					YELLOW"is eating"BASIC
-# define PHILO_SLEEPING					CYAN"is sleeping"BASIC
-# define PHILO_THINKING					CYAN"is thinking"BASIC
-# define PHILO_DEAD						RED"died"BASIC
+# define PHILO_HAS_LEFT_FORK			"has taken a fork"
+# define PHILO_HAS_RIGHT_FORK			"has taken a fork"
+# define PHILO_EATING					"is eating"
+# define PHILO_SLEEPING					"is sleeping"
+# define PHILO_THINKING					"is thinking"
+# define PHILO_DEAD						"died"
 
-# define P_MAX_ARGS						5
-# define P_MIN_ARGS						4
+# define MAX_ARGS						5
+# define MIN_ARGS						4
 
 # define EOL							'\0'
 # define STDIN							0

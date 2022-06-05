@@ -6,7 +6,7 @@
 /*   By: mmarcele <mmarcele@student.21-school.ru    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 23:30:07 by mmarcele          #+#    #+#             */
-/*   Updated: 2022/06/05 12:11:39 by mmarcele         ###   ########.fr       */
+/*   Updated: 2022/06/05 13:16:34 by mmarcele         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,8 +40,8 @@ or creation]"
 # define ERROR_MEALS_STRING				"Error 103 [Wrong input in \
 number_of_times_each_philosopher_must_eat]"
 # define ERROR_INPUT_STRING				"Error 101 [Wrong input, try ./philo \
-(number_of_philosophers) (time_to_die) (time_to_eat) (time_to_sleep) \
->(number_of_times_each_philosopher_must_eat)<"
+'(number_of_philosophers)' '(time_to_die)' '(time_to_eat)' '(time_to_sleep)' \
+'<number_of_times_each_philosopher_must_eat>']"
 # define ERROR_THREADS_STRING			"Error 102 [Something went wrong \
 with threads]"
 # define ERROR_UNKNOWN_STRING			"Error 108 [Unknown error]"

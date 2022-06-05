@@ -6,7 +6,7 @@
 /*   By: mmarcele <mmarcele@student.21-school.ru    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 23:29:47 by mmarcele          #+#    #+#             */
-/*   Updated: 2022/06/05 13:00:00 by mmarcele         ###   ########.fr       */
+/*   Updated: 2022/06/05 13:21:53 by mmarcele         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,7 @@ void	*kettle(void *arg)
 	if (philo->id % 2 == 0)
 	{
 		philo_think(philo, inst);
-		usleep(50);
+		ft_usleep(50);
 	}
 	while (inst->death_status == 0)
 	{
