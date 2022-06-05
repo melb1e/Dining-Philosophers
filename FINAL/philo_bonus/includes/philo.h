@@ -51,5 +51,6 @@ time_t				ft_timestamp(void);
 void				display_status(t_philos *philo, int id, char *action);
 int					ft_atoi(char *str);
 int					ft_error(t_philos *philo, int e_status, int level);
+void				ft_free(t_philos *philo, int level);
 
 #endif

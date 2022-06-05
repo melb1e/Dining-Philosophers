@@ -6,7 +6,7 @@
 /*   By: mmarcele <mmarcele@student.21-school.ru    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/05 00:43:05 by mmarcele          #+#    #+#             */
-/*   Updated: 2022/06/05 13:30:42 by mmarcele         ###   ########.fr       */
+/*   Updated: 2022/06/05 14:01:00 by mmarcele         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,22 +19,15 @@ static int	kill_children(t_philos *philo)
 	i = 0;
 	while (i < philo->number)
 	{
-		// pthread_cancel(philo->death_status);
 		kill(philo->pid[i++], SIGKILL);
 	}
 	return (OK);
 }
 
-static int	thread_canceller(t_philos *philo, int e_status)
+static int	thread_canceller(int e_status)
 {
-	int	i;
-
-	i = 0;
-	while (i < philo->number)
-	{
-		pthread_cancel(philo->death_status);
-	}
-	return (e_status);
+	ft_error(NULL, e_status, 1);
+	exit(1);
 }
 
 int	thread_master(t_philos *philo)
@@ -54,7 +47,7 @@ int	thread_master(t_philos *philo)
 			philo->id = i;
 			philo->last_ate = philo->timestamp;
 			if (kettle(philo) != OK)
-				return (thread_canceller(philo, ERROR_THREADS));
+				return (thread_canceller(ERROR_THREADS));
 		}
 	}
 	while (waitpid(-1, &status, 0) > 0)

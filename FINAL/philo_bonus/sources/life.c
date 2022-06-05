@@ -6,7 +6,7 @@
 /*   By: mmarcele <mmarcele@student.21-school.ru    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/05 00:42:59 by mmarcele          #+#    #+#             */
-/*   Updated: 2022/06/05 13:33:25 by mmarcele         ###   ########.fr       */
+/*   Updated: 2022/06/05 13:58:26 by mmarcele         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,7 @@ int	kettle(t_philos *philo)
 			philo_think(philo);
 		}
 	}
-	if (pthread_join(philo->dead, NULL))
+	if (pthread_join(philo->death_status, NULL))
 		return (ERROR_THREADS);
 	return (OK);
 }
