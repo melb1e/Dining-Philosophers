@@ -6,7 +6,7 @@
 /*   By: mmarcele <mmarcele@student.21-school.ru    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 23:30:07 by mmarcele          #+#    #+#             */
-/*   Updated: 2022/06/05 12:11:39 by mmarcele         ###   ########.fr       */
+/*   Updated: 2022/06/05 00:35:39 by mmarcele         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,6 @@
 # define ERROR_FORKS					-110
 # define ERROR_INITIALIZATION			-111
 # define ERROR_FORKING					-112
-# define ERROR_MUTEX_DESTRUCTION		-113
-# define ERROR_MALLOC					-114
 
 # define ERROR_OVERFLOW					-202
 
@@ -40,16 +38,15 @@ or creation]"
 # define ERROR_MEALS_STRING				"Error 103 [Wrong input in \
 number_of_times_each_philosopher_must_eat]"
 # define ERROR_INPUT_STRING				"Error 101 [Wrong input, try ./philo \
-(number_of_philosophers) (time_to_die) (time_to_eat) (time_to_sleep) \
->(number_of_times_each_philosopher_must_eat)<"
+(number_of_philosophers) \
+(time_to_die) \
+(time_to_eat) \
+(time_to_sleep) \
+{number_of_times_each_philosopher_must_eat}"
 # define ERROR_THREADS_STRING			"Error 102 [Something went wrong \
 with threads]"
 # define ERROR_UNKNOWN_STRING			"Error 108 [Unknown error]"
 # define ERROR_INITIALIZATION_STRING	"Error 109 [Initialization error]"
-# define ERROR_MUTEX_DESTRUCTION_STR	"Error 113 [Mutex destruction was \
-unsuccessful]"
-# define ERROR_MALLOC_STING				"Error 114 [Unsuccessful memory \
-allocation]"
 
 # define PHILO_HAS_LEFT_FORK			"has taken a fork"
 # define PHILO_HAS_RIGHT_FORK			"has taken a fork"

@@ -6,42 +6,32 @@
 /*   By: mmarcele <mmarcele@student.21-school.ru    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 23:29:40 by mmarcele          #+#    #+#             */
-/*   Updated: 2022/06/05 00:33:28 by mmarcele         ###   ########.fr       */
+/*   Updated: 2022/06/05 12:55:54 by mmarcele         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philo.h"
 
-static int	ft_strcmp(char *str1, char *str2)
+int	display_status(t_inst *inst, size_t id, char *status)
 {
-	size_t	i;
-
-	i = 0;
-	while (str1[i] && str2[i])
-	{
-		if (str1[i] == str2[i])
-			i++;
-		else if (str1[i] != str2[i])
-			return (ERROR);
-	}
-	return (OK);
-}
-
-void	display_status(t_inst *inst, size_t id, char *status)
-{
+	if (inst->death_status && status[0] != 'd')
+		return (EXIT_FAILURE);
 	pthread_mutex_lock(&inst->report_status);
-	if (*status == 'h')
+	if (inst->death_status && status[0] != 'd')
+		return (EXIT_FAILURE);
+	if (status[0] == 'h')
 		printf("%li %li "GREEN"%s"BASIC"\n", \
-				ft_timestamp() - inst->timestamp, id + 1, status);
+				ft_timestamp() - inst->timestamp, id, status);
+	else if (status[0] == 'd')
+		printf("%li %li "RED"%s"BASIC"\n", \
+				ft_timestamp() - inst->timestamp, id, status);
 	else if (status[3] == 'e')
 		printf("%li %li "CYAN"%s"BASIC"\n", \
-				ft_timestamp() - inst->timestamp, id + 1, status);
-	else if (*status == 'i')
+				ft_timestamp() - inst->timestamp, id, status);
+	else if (status[0] == 'i')
 		printf("%li %li "YELLOW"%s"BASIC"\n", \
-				ft_timestamp() - inst->timestamp, id + 1, status);
-	else if (*status == 'd')
-		printf("%li %li "RED"%s"BASIC"\n", \
-				ft_timestamp() - inst->timestamp, id + 1, status);
-	if (ft_strcmp(status, PHILO_DEAD))
+				ft_timestamp() - inst->timestamp, id, status);
+	if (status[0] != 'd')
 		pthread_mutex_unlock(&inst->report_status);
+	return (OK);
 }

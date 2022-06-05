@@ -6,33 +6,11 @@
 /*   By: mmarcele <mmarcele@student.21-school.ru    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 23:29:55 by mmarcele          #+#    #+#             */
-/*   Updated: 2022/06/05 11:58:29 by mmarcele         ###   ########.fr       */
+/*   Updated: 2022/06/04 23:31:53 by mmarcele         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philo.h"
-
-void	ft_destroy_mutex(t_inst *inst, int level)
-{
-	int	i;
-	int	e_status;
-
-	i = 0;
-	e_status = OK;
-	while (i < inst->number)
-	{
-		if (level == 3)
-		{
-			if (pthread_mutex_destroy(&inst->forks[i]))
-				e_status = ERROR_MUTEX_DESTRUCTION;
-		}
-		i++;
-	}
-	pthread_mutex_destroy(&inst->report_status);
-	if (e_status != OK)
-		ft_error(e_status, NULL, level);
-	return ;
-}
 
 static char	*ft_erno_helper(int e_status)
 {
@@ -44,28 +22,13 @@ static char	*ft_erno_helper(int e_status)
 		return (ERROR_INPUT_STRING);
 	else if (e_status == ERROR_MUTEX)
 		return (ERROR_MUTEX_STRING);
-	else if (e_status == ERROR_MUTEX_DESTRUCTION)
-		return (ERROR_MUTEX_DESTRUCTION_STR);
 	else if (e_status == ERROR_INITIALIZATION)
 		return (ERROR_INITIALIZATION_STRING);
-	else if (e_status == ERROR_MALLOC)
-		return (ERROR_MALLOC_STING);
 	else
 		return (ERROR_UNKNOWN_STRING);
 }
 
-void	ft_free(t_inst *inst)
-{
-	if (inst->philos)
-		free(inst->philos);
-	if (inst->forks)
-		free(inst->forks);
-	if (inst->thread)
-		free(inst->thread);
-	free(inst);
-}
-
-int	ft_error(int e_status, t_inst *inst, int level)
+int	ft_error(int e_status)
 {
 	if (!e_status)
 	{
@@ -76,7 +39,5 @@ int	ft_error(int e_status, t_inst *inst, int level)
 	{
 		printf("%s\n", ft_erno_helper(e_status));
 	}
-	if (level == 3)
-		ft_free(inst);
 	return (e_status);
 }

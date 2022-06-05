@@ -6,36 +6,47 @@
 /*   By: mmarcele <mmarcele@student.21-school.ru    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 23:29:37 by mmarcele          #+#    #+#             */
-/*   Updated: 2022/06/05 12:45:09 by mmarcele         ###   ########.fr       */
+/*   Updated: 2022/06/05 01:12:58 by mmarcele         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philo.h"
 
+time_t	ft_timestamp(void)
+{
+	struct timeval	time;
+	time_t			ms;
+
+	gettimeofday(&time, NULL);
+	ms = time.tv_sec * 1000 + time.tv_usec / 1000;
+	return (ms);
+}
+
 int	thread_master(t_inst *inst)
 {
-	pthread_t	dead;
-	int			i;
+	int	i;
 
 	i = 0;
 	inst->timestamp = ft_timestamp();
 	while (i < inst->number)
 	{
-		inst->philos[i].initial = inst->timestamp;
-		inst->philos[i].last_ate = inst->timestamp;
+		inst->philos[i]->last_ate = ft_timestamp();
+		if (pthread_create(&inst->philos[i]->thread, NULL, &kettle, \
+			(void *)inst->philos[i]))
+			return (ERROR_THREADS);
 		i++;
+		usleep(100);
 	}
 	i = 0;
 	while (i < inst->number)
 	{
-		pthread_create(&inst->thread[i], NULL, &kettle, &inst->philos[i]);
+		if (pthread_create(&inst->philos[i]->dead, NULL, &death_checker, \
+			(void *)inst->philos[i]))
+			return (ERROR_THREADS);
 		i++;
+		usleep(100);
 	}
-	pthread_create(&dead, NULL, &death_checker, (void *)inst);
-	pthread_mutex_unlock(&inst->report_status);
-	pthread_join(dead, NULL);
-	i = 0;
-	while (i < inst->number)
-		pthread_join(inst->thread[i++], NULL);
+	while (!inst->death_status)
+		continue ;
 	return (OK);
 }

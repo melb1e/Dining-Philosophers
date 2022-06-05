@@ -6,7 +6,7 @@
 /*   By: mmarcele <mmarcele@student.21-school.ru    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/05 00:43:05 by mmarcele          #+#    #+#             */
-/*   Updated: 2022/06/05 01:05:39 by mmarcele         ###   ########.fr       */
+/*   Updated: 2022/06/05 12:06:05 by mmarcele         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ int	thread_master(t_philos *philo)
 			return (ERROR_FORKING);
 		if (philo->pid[i++] == 0)
 		{
-			philo->id = i;
+			philo->id = i + 1;
 			philo->last_ate = philo->timestamp;
 			if (kettle(philo) != OK)
 				return (thread_canceller(philo, ERROR_THREADS));

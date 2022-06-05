@@ -6,7 +6,7 @@
 /*   By: mmarcele <mmarcele@student.21-school.ru    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 23:29:30 by mmarcele          #+#    #+#             */
-/*   Updated: 2022/06/05 12:10:37 by mmarcele         ###   ########.fr       */
+/*   Updated: 2022/06/04 23:32:38 by mmarcele         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,23 +49,32 @@ int	ft_atoi(const char *str)
 	return (ft_overflow(nbr, sign));
 }
 
-int	scan_args(const int ac, const char **av)
+static int	ft_isnumeric(const char *str)
 {
-	if (ac - 1 <= MAX_ARGS && ac - 1 >= MIN_ARGS)
-		if (ft_atoi(av[1]) > 0 && ft_atoi(av[2]) > 0 && \
-			ft_atoi(av[3]) > 0 && ft_atoi(av[4]) > 0 && \
-			(ac - 1 == MIN_ARGS || \
-			(ac - 1 == MAX_ARGS && ft_atoi(av[5]) > 0)))
-			return (OK);
-	return (ERROR_INPUT);
+	int	i;
+
+	i = 0;
+	while (str[i] != EOL)
+	{
+		if (str[i] <= '0' || str[i] >= '9')
+			return (ERROR);
+		i++;
+	}
+	return (OK);
 }
 
-time_t	ft_timestamp(void)
+int	scan_args(const int ac, const char **av)
 {
-	struct timeval	time;
-	time_t			ms;
+	int	i;
 
-	gettimeofday(&time, NULL);
-	ms = time.tv_sec * 1000 + time.tv_usec / 1000;
-	return (ms);
+	i = 0;
+	if (ac - 1 > MAX_ARGS || ac - 1 < MIN_ARGS)
+		return (ERROR_INPUT);
+	while (i < (int)ac)
+	{
+		if (av[i][0] == '-' && ft_isnumeric(av[i]) != OK)
+			return (ERROR_INPUT);
+		i++;
+	}
+	return (OK);
 }

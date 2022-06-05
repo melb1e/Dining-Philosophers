@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: mmarcele <mmarcele@student.21-school.ru    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/05 00:43:15 by mmarcele          #+#    #+#             */
-/*   Updated: 2022/06/05 12:05:39 by mmarcele         ###   ########.fr       */
+/*   Created: 2022/06/04 23:29:40 by mmarcele          #+#    #+#             */
+/*   Updated: 2022/06/05 00:33:28 by mmarcele         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,11 +17,9 @@ static int	ft_strcmp(char *str1, char *str2)
 	size_t	i;
 
 	i = 0;
-	if ((!str1 && str2) || (!str2 && str1))
-		return (ERROR);
 	while (str1[i] && str2[i])
 	{
-		if (str1[i]== str2[i])
+		if (str1[i] == str2[i])
 			i++;
 		else if (str1[i] != str2[i])
 			return (ERROR);
@@ -29,22 +27,21 @@ static int	ft_strcmp(char *str1, char *str2)
 	return (OK);
 }
 
-void	display_status(t_philos *philo, int id, char *action)
+void	display_status(t_inst *inst, size_t id, char *status)
 {
-	sem_wait(philo->report_status);
-
-	if (*action == 'h')
-		printf("%li %i "GREEN"%s"BASIC"\n", \
-				ft_timestamp() - philo->timestamp, id, action);
-	else if (action[3] == 'e')
-		printf("%li %i "CYAN"%s"BASIC"\n", \
-				ft_timestamp() - philo->timestamp, id, action);
-	else if (*action == 'i')
-		printf("%li %i "YELLOW"%s"BASIC"\n", \
-				ft_timestamp() - philo->timestamp, id, action);
-	else if (*action == 'd')
-		printf("%li %i "RED"%s"BASIC"\n", \
-				ft_timestamp() - philo->timestamp, id, action);
-	if (ft_strcmp(action, PHILO_DEAD))
-		sem_post(philo->report_status);
+	pthread_mutex_lock(&inst->report_status);
+	if (*status == 'h')
+		printf("%li %li "GREEN"%s"BASIC"\n", \
+				ft_timestamp() - inst->timestamp, id + 1, status);
+	else if (status[3] == 'e')
+		printf("%li %li "CYAN"%s"BASIC"\n", \
+				ft_timestamp() - inst->timestamp, id + 1, status);
+	else if (*status == 'i')
+		printf("%li %li "YELLOW"%s"BASIC"\n", \
+				ft_timestamp() - inst->timestamp, id + 1, status);
+	else if (*status == 'd')
+		printf("%li %li "RED"%s"BASIC"\n", \
+				ft_timestamp() - inst->timestamp, id + 1, status);
+	if (ft_strcmp(status, PHILO_DEAD))
+		pthread_mutex_unlock(&inst->report_status);
 }

@@ -6,7 +6,7 @@
 /*   By: mmarcele <mmarcele@student.21-school.ru    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 23:29:59 by mmarcele          #+#    #+#             */
-/*   Updated: 2022/06/05 12:55:52 by mmarcele         ###   ########.fr       */
+/*   Updated: 2022/06/04 23:31:22 by mmarcele         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,28 +14,23 @@
 
 void	*death_checker(void *arg)
 {
-	t_philos	*philos;
-	t_inst		*inst;
-	int			i;
+	t_philos	*philo;
 
-	inst = (t_inst *)arg;
-	philos = inst->philos;
-	while (TRUE)
+	philo = (t_philos *)arg;
+	while (!philo->installments->death_status)
 	{
-		i = 0;
-		while (i < inst->number)
+		if (!philo->philo_eat && ft_timestamp() - philo->last_ate >= \
+			philo->installments->time_to_die)
 		{
-			if (inst->meals_goal > 0)
-				if (inst->meals_goal == philos->meals_done)
-					return (NULL);
-			if (ft_timestamp() - philos[i].last_ate >= philos[i].time_to_die)
-			{
-				inst->death_status = 1;
-				display_status(inst, philos->id, PHILO_DEAD);
-				return (NULL);
-			}
-			i++;
+			pthread_mutex_lock(&philo->eat_status);
+			display_status(philo->installments, philo->id, PHILO_DEAD);
+			philo->installments->death_status = 1;
+			pthread_mutex_unlock(&philo->eat_status);
 		}
+		if (philo->installments->philos[philo->installments->number - \
+			1]->meals_done == philo->installments->meals_goal)
+			philo->installments->death_status = 1;
+		usleep(100);
 	}
 	return (NULL);
 }
