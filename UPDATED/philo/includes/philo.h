@@ -6,7 +6,7 @@
 /*   By: mmarcele <mmarcele@student.21-school.ru    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 23:30:03 by mmarcele          #+#    #+#             */
-/*   Updated: 2022/06/05 12:07:11 by mmarcele         ###   ########.fr       */
+/*   Updated: 2022/06/05 13:03:18 by mmarcele         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,6 @@ int					display_status(t_inst *inst, size_t id, char *status);
 int					ft_atoi(const char *str);
 int					ft_error(int e_status, t_inst *inst, int level);
 void				ft_free(t_inst *inst);
-void				ft_destroy_mutex(t_inst *inst, int level);		
+void				ft_destroy_mutex(t_inst *inst);		
 
 #endif

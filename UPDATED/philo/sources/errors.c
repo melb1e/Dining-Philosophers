@@ -6,13 +6,13 @@
 /*   By: mmarcele <mmarcele@student.21-school.ru    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 23:29:55 by mmarcele          #+#    #+#             */
-/*   Updated: 2022/06/05 11:58:29 by mmarcele         ###   ########.fr       */
+/*   Updated: 2022/06/05 13:03:13 by mmarcele         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philo.h"
 
-void	ft_destroy_mutex(t_inst *inst, int level)
+void	ft_destroy_mutex(t_inst *inst)
 {
 	int	i;
 	int	e_status;
@@ -21,16 +21,13 @@ void	ft_destroy_mutex(t_inst *inst, int level)
 	e_status = OK;
 	while (i < inst->number)
 	{
-		if (level == 3)
-		{
-			if (pthread_mutex_destroy(&inst->forks[i]))
-				e_status = ERROR_MUTEX_DESTRUCTION;
-		}
+		if (pthread_mutex_destroy(&inst->forks[i]))
+			e_status = ERROR_MUTEX_DESTRUCTION;
 		i++;
 	}
-	pthread_mutex_destroy(&inst->report_status);
 	if (e_status != OK)
-		ft_error(e_status, NULL, level);
+		ft_error(e_status, NULL, 1);
+	pthread_mutex_destroy(&inst->report_status);
 	return ;
 }
 

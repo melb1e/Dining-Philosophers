@@ -6,7 +6,7 @@
 /*   By: mmarcele <mmarcele@student.21-school.ru    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/04 23:29:44 by mmarcele          #+#    #+#             */
-/*   Updated: 2022/06/05 12:09:30 by mmarcele         ###   ########.fr       */
+/*   Updated: 2022/06/05 13:03:27 by mmarcele         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ int	main(const int ac, const char **av)
 	}
 	else
 		return (ft_error(e_status, inst, 1));
-	ft_destroy_mutex(inst, 3);
+	ft_destroy_mutex(inst);
 	ft_free(inst);
 	return (OK);
 }
