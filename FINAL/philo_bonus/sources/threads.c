@@ -6,7 +6,7 @@
 /*   By: mmarcele <mmarcele@student.21-school.ru    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/05 00:43:05 by mmarcele          #+#    #+#             */
-/*   Updated: 2022/06/05 14:01:00 by mmarcele         ###   ########.fr       */
+/*   Updated: 2022/06/05 14:16:40 by mmarcele         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ static int	thread_canceller(int e_status)
 int	thread_master(t_philos *philo)
 {
 	int	i;
-	int status;
+	int	status;
 
 	i = 0;
 	philo->timestamp = ft_timestamp();

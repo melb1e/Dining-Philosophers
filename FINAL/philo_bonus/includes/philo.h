@@ -1,9 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   philo.h                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mmarcele <mmarcele@student.21-school.ru    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/06/05 14:14:57 by mmarcele          #+#    #+#             */
+/*   Updated: 2022/06/05 14:15:08 by mmarcele         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef PHILO_H
 # define PHILO_H
 
-/*
-** Libraries
-*/
 # include <stdio.h>
 # include <stdlib.h>
 # include <pthread.h>
@@ -15,9 +24,6 @@
 # include <sys/stat.h>
 # include <sys/wait.h>
 # include <signal.h>
-/*
-** Headers of the project
-*/
 # include "defines.h"
 
 typedef struct s_freak

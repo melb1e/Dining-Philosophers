@@ -6,7 +6,7 @@
 /*   By: mmarcele <mmarcele@student.21-school.ru    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/05 00:42:59 by mmarcele          #+#    #+#             */
-/*   Updated: 2022/06/05 13:58:26 by mmarcele         ###   ########.fr       */
+/*   Updated: 2022/06/05 14:15:34 by mmarcele         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,8 @@ void	ft_usleep(time_t time)
 
 int	kettle(t_philos *philo)
 {
-	if (pthread_create(&philo->death_status, NULL, &death_checker, (void *)philo))
+	if (pthread_create(&philo->death_status, NULL, &death_checker, \
+		(void *)philo))
 		return (ERROR_THREADS);
 	if (philo->id % 2 == 0)
 	{

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   defines.h                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mmarcele <mmarcele@student.21-school.ru    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/06/05 14:14:51 by mmarcele          #+#    #+#             */
+/*   Updated: 2022/06/05 14:14:51 by mmarcele         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef DEFINES_H
 # define DEFINES_H
 
@@ -22,14 +34,17 @@
 
 # define ERROR_OVERFLOW					-202
 
-# define ERROR_MUTEX_STRING				"Error 104 [Mutex initialization or creation]"
+# define ERROR_MUTEX_STRING				"Error 104 [Mutex initialization \
+or creation]"
 # define ERROR_MEALS_STRING				"Error 103 [Wrong input in \
 number_of_times_each_philosopher_must_eat]"
 # define ERROR_INPUT_STRING				"Error 101 [Wrong input, try ./philo \
 '(number_of_philosophers)' '(time_to_die)' '(time_to_eat)' '(time_to_sleep)' \
 '<number_of_times_each_philosopher_must_eat>']"
-# define ERROR_THREADS_STRING			"Error 102 [Something went wrong with threads]"
-# define ERROR_SEMAPHORE_STRING			"Error 105 [Semaphores isn't working properly]"
+# define ERROR_THREADS_STRING			"Error 102 [Something went wrong with \
+threads]"
+# define ERROR_SEMAPHORE_STRING			"Error 105 [Semaphores isn't working \
+properly]"
 # define ERROR_UNKNOWN_STRING			"Error 108 [Unknown error]"
 # define ERROR_INITIALIZATION_STRING	"Error 109 [Initialization error]"
 

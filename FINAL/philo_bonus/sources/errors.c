@@ -6,7 +6,7 @@
 /*   By: mmarcele <mmarcele@student.21-school.ru    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/05 00:42:43 by mmarcele          #+#    #+#             */
-/*   Updated: 2022/06/05 14:04:42 by mmarcele         ###   ########.fr       */
+/*   Updated: 2022/06/05 14:16:31 by mmarcele         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,11 +17,11 @@ static char	*ft_erno_helper(int e_status)
 	if (e_status == ERROR_INPUT)
 		return (ERROR_INPUT_STRING);
 	else if (e_status == ERROR_THREADS)
-	return (ERROR_INPUT_STRING);
+		return (ERROR_INPUT_STRING);
 	else if (e_status == ERROR_MEALS)
-	return (ERROR_INPUT_STRING);
+		return (ERROR_INPUT_STRING);
 	else if (e_status == ERROR_MUTEX)
-	return (ERROR_INPUT_STRING);
+		return (ERROR_INPUT_STRING);
 	else if (e_status == ERROR_SEMAPHORE)
 		return (ERROR_INPUT_STRING);
 	else if (e_status == ERROR_INITIALIZATION)

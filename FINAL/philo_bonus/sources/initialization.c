@@ -6,7 +6,7 @@
 /*   By: mmarcele <mmarcele@student.21-school.ru    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/05 00:42:54 by mmarcele          #+#    #+#             */
-/*   Updated: 2022/06/05 14:09:22 by mmarcele         ###   ########.fr       */
+/*   Updated: 2022/06/05 14:16:48 by mmarcele         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 t_philos	*initialization(int ac, char **av)
 {
 	t_philos	*philo;
-	int		i;
+	int			i;
 
 	i = 1;
 	philo = malloc(sizeof(t_philos));

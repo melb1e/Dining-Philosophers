@@ -6,7 +6,7 @@
 /*   By: mmarcele <mmarcele@student.21-school.ru    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/05 00:43:22 by mmarcele          #+#    #+#             */
-/*   Updated: 2022/06/05 00:43:24 by mmarcele         ###   ########.fr       */
+/*   Updated: 2022/06/05 14:16:18 by mmarcele         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,8 @@ static	int	ft_overflow(unsigned long long nbr, int sign)
 {
 	if (nbr > ULLONG_MAX && sign == -1)
 		return (ERROR_OVERFLOW);
-	else if ((nbr > 2147483647 && sign == 1) || (nbr > 2147483648 && sign == -1))
+	else if ((nbr > 2147483647 && sign == 1) || (nbr > 2147483648 && \
+				sign == -1))
 		return (ERROR_OVERFLOW);
 	return (nbr * sign);
 }
@@ -25,7 +26,7 @@ int	ft_atoi(char *str)
 {
 	unsigned long long	nbr;
 	long long			sign;
-	int				i;
+	int					i;
 
 	i = 0;
 	nbr = 0;
@@ -43,7 +44,7 @@ int	ft_atoi(char *str)
 	}
 	else if (str[i] == '+')
 		i++;
-	while(str[i] >= '0' && str[i] <= '9')
+	while (str[i] >= '0' && str[i] <= '9')
 		nbr = nbr * 10 + str[i++] - '0';
 	return (ft_overflow(nbr, sign));
 }
@@ -52,7 +53,7 @@ int	scan_args(int ac, char **av)
 {
 	if (ac - 1 <= P_MAX_ARGS && ac - 1 >= P_MIN_ARGS)
 		if (ft_atoi(av[1]) > 0 && ft_atoi(av[2]) > 0 && \
-			ft_atoi(av[3]) > 0 && ft_atoi(av[4]) > 0 &&\
+			ft_atoi(av[3]) > 0 && ft_atoi(av[4]) > 0 && \
 			(ac - 1 == P_MIN_ARGS || \
 			(ac - 1 == P_MAX_ARGS && ft_atoi(av[5]) > 0)))
 			return (OK);
