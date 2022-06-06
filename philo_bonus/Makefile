@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: mmarcele <mmarcele@student.21-school.ru    +#+  +:+       +#+         #
+#    By: mmarcele <mmarcele@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/06/05 00:35:48 by mmarcele          #+#    #+#              #
-#    Updated: 2022/06/05 01:02:53 by mmarcele         ###   ########.fr        #
+#    Updated: 2022/06/06 13:01:20 by mmarcele         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -32,7 +32,7 @@ HEADERS			:=	defines.h \
 OBJS			:=	$(addprefix ${OBJECTS}/, $(SRCS:.c=.o))
 
 CC				:=	clang
-CFLAGS			:=	-Wall -Wextra -Werror #-g #-fsanitize=address
+CFLAGS			:=	-Wall -Wextra -Werror
 CINCLUDES		:=	-I ${INCLUDES}
 CDEPENDENCIES	:=	-pthread -lpthread
 

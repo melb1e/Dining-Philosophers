@@ -3,14 +3,24 @@
 /*                                                        :::      ::::::::   */
 /*   life.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mmarcele <mmarcele@student.21-school.ru    +#+  +:+       +#+        */
+/*   By: mmarcele <mmarcele@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/05 00:42:59 by mmarcele          #+#    #+#             */
-/*   Updated: 2022/06/05 14:15:34 by mmarcele         ###   ########.fr       */
+/*   Updated: 2022/06/06 13:02:50 by mmarcele         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philo.h"
+
+void	ft_usleep(time_t time)
+{
+	time_t	initial;
+
+	initial = ft_timestamp();
+	while (ft_timestamp() - initial < time)
+		usleep(100);
+	return ;
+}
 
 static void	philo_think(t_philos *philo)
 {
@@ -24,9 +34,7 @@ static void	philo_sleep(t_philos *philo)
 
 	display_status(philo, philo->id, PHILO_SLEEPING);
 	time = ft_timestamp();
-	usleep(philo->time_to_sleep);
-	while (ft_timestamp() - time < philo->time_to_sleep)
-		continue ;
+	ft_usleep(philo->time_to_sleep);
 	return ;
 }
 
@@ -42,23 +50,11 @@ static int	philo_eat(t_philos *philo)
 	display_status(philo, philo->id, PHILO_HAS_RIGHT_FORK);
 	display_status(philo, philo->id, PHILO_EATING);
 	philo->last_ate = ft_timestamp();
-	usleep(philo->time_to_eat);
-	while (ft_timestamp() - philo->last_ate < philo->time_to_eat)
-		continue ;
+	ft_usleep(philo->time_to_eat);
 	philo->meals_done += 1;
 	sem_post(philo->forks_status);
 	sem_post(philo->forks_status);
 	return (OK);
-}
-
-void	ft_usleep(time_t time)
-{
-	time_t	initial;
-
-	initial = ft_timestamp();
-	while (ft_timestamp() - initial < time)
-		usleep(100);
-	return ;
 }
 
 int	kettle(t_philos *philo)
