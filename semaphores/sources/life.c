@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   life.c                                             :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mmarcele <mmarcele@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/05 00:42:59 by mmarcele          #+#    #+#             */
-/*   Updated: 2022/06/06 13:02:50 by mmarcele         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "../includes/philo.h"
 
 void	ft_usleep(time_t time)
@@ -30,10 +18,7 @@ static void	philo_think(t_philos *philo)
 
 static void	philo_sleep(t_philos *philo)
 {
-	time_t	time;
-
 	display_status(philo, philo->id, PHILO_SLEEPING);
-	time = ft_timestamp();
 	ft_usleep(philo->time_to_sleep);
 	return ;
 }

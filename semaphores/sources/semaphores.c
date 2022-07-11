@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   semaphores.c                                       :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mmarcele <mmarcele@student.21-school.ru    +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/05 00:43:10 by mmarcele          #+#    #+#             */
-/*   Updated: 2022/06/05 14:10:34 by mmarcele         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "../includes/philo.h"
 
 static int	free_semaphore(t_philos *philo, int e_status, int level)
