@@ -3,14 +3,14 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: mmarcele <mmarcele@student.42.fr>          +#+  +:+       +#+         #
+#    By: mmarcele <mmarcele@student.21-school.ru    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/06/05 00:35:48 by mmarcele          #+#    #+#              #
-#    Updated: 2022/06/06 13:01:25 by mmarcele         ###   ########.fr        #
+#    Updated: 2022/07/11 12:35:00 by mmarcele         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME			:=	philo
+NAME			:=	dining_philosophers
 
 SOURCES			:=	./sources
 INCLUDES		:=	./includes

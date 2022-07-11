@@ -1,4 +1,4 @@
-make --dry-run --always-make --keep-going --print-directory
+make --dry-run --keep-going --print-directory
 make: Entering directory '/home/melb1e/Documents/Dining-Philosophers'
 make: Leaving directory '/home/melb1e/Documents/Dining-Philosophers'
  
